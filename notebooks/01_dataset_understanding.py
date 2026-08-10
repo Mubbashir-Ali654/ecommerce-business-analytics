@@ -318,58 +318,208 @@ order_items = pd.read_csv(
     "data/olist_order_items_dataset.csv"
 )
 
-print("\nFirst 5 order items:")
-print(order_items.head())
+#print("\nFirst 5 order items:")
+#print(order_items.head())
+
+#print("\nShape:")
+#print(order_items.shape)
+
+#print("\nColumns:")
+#print(order_items.columns)
+
+#print("\nData types:")
+#print(order_items.dtypes)
+
+#print("\nMissing values:")
+#print(order_items.isnull().sum())
+
+#print("\nDuplicate rows:")
+#print(order_items.duplicated().sum())
+
+#items_per_order = (
+#    order_items
+#    .groupby("order_id")["order_item_id"]
+#    .count()
+#    .sort_values(ascending=False)
+#)
+
+#print(items_per_order.head(10))
+
+#print(
+#    "Maximum items in one order:",
+#    items_per_order.max()
+#)
+
+#print("\nPrice statistics:")
+#print(order_items["price"].describe())
+
+#print("\nFreight statistics:")
+#print(order_items["freight_value"].describe())
+
+#order_items["shipping_limit_date"] = pd.to_datetime(
+#    order_items["shipping_limit_date"]
+#)
+
+#print(order_items["shipping_limit_date"].dtype)
+
+#print("\nShipping limit date range:")
+
+#print(
+#    "Earliest:",
+#    order_items["shipping_limit_date"].min()
+#)
+
+#print(
+#    "Latest:",
+#    order_items["shipping_limit_date"].max()
+#)
+
+
+# ==========================================
+# PRODUCTS DATASET
+# ==========================================
+
+products = pd.read_csv(
+    "data/olist_products_dataset.csv"
+)
+
+print("\nFirst 5 products:")
+print(products.head())
 
 print("\nShape:")
-print(order_items.shape)
+print(products.shape)
 
 print("\nColumns:")
-print(order_items.columns)
+print(products.columns)
 
 print("\nData types:")
-print(order_items.dtypes)
+print(products.dtypes)
 
 print("\nMissing values:")
-print(order_items.isnull().sum())
+print(products.isnull().sum())
 
 print("\nDuplicate rows:")
-print(order_items.duplicated().sum())
+print(products.duplicated().sum())
+print("\nUnique product IDs:")
+print(products["product_id"].nunique())
 
-items_per_order = (
-    order_items
-    .groupby("order_id")["order_item_id"]
-    .count()
+print(
+    "Unique products in order_items:",
+    order_items["product_id"].nunique()
+)
+
+print(
+    "Unique products in products:",
+    products["product_id"].nunique()
+)
+
+missing_products = (
+    set(order_items["product_id"])
+    - set(products["product_id"])
+)
+
+print(
+    "Product IDs in order_items but missing from products:",
+    len(missing_products)
+)
+
+
+# ==========================================
+# ORDER ITEMS + PRODUCTS
+# ==========================================
+
+items_products = order_items.merge(
+    products[
+        [
+            "product_id",
+            "product_category_name"
+        ]
+    ],
+    on="product_id",
+    how="left"
+)
+
+print("\nMerged data:")
+print(items_products.head())
+
+print("\nShape:")
+print(items_products.shape)
+
+print("\nMissing product categories:")
+print(
+    items_products["product_category_name"].isnull().sum()
+)
+
+print(
+    "Rows before merge:",
+    len(order_items)
+)
+
+print(
+    "Rows after merge:",
+    len(items_products)
+)
+
+category_revenue = (
+    items_products
+    .groupby("product_category_name")["price"]
+    .sum()
     .sort_values(ascending=False)
 )
 
-print(items_per_order.head(10))
+print("\nTop 10 categories by revenue:")
+print(category_revenue.head(10))
 
 print(
-    "Maximum items in one order:",
-    items_per_order.max()
+    "\nNumber of product categories:",
+    category_revenue.shape[0]
 )
 
-print("\nPrice statistics:")
-print(order_items["price"].describe())
+uncategorized_revenue = items_products.loc[
+    items_products["product_category_name"].isna(),
+    "price"
+].sum()
 
-print("\nFreight statistics:")
-print(order_items["freight_value"].describe())
+total_revenue = items_products["price"].sum()
 
-order_items["shipping_limit_date"] = pd.to_datetime(
-    order_items["shipping_limit_date"]
-)
-
-print(order_items["shipping_limit_date"].dtype)
-
-print("\nShipping limit date range:")
+print("Revenue from uncategorized products:", uncategorized_revenue)
 
 print(
-    "Earliest:",
-    order_items["shipping_limit_date"].min()
+    "Uncategorized revenue percentage:",
+    f"{uncategorized_revenue / total_revenue * 100:.2f}%"
 )
 
-print(
-    "Latest:",
-    order_items["shipping_limit_date"].max()
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+top_10_categories = (
+    items_products
+    .dropna(subset=["product_category_name"])
+    .groupby("product_category_name")["price"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+    .sort_values()
 )
+
+plt.figure(figsize=(10, 6))
+
+sns.barplot(
+    x=top_10_categories.values,
+    y=top_10_categories.index
+)
+
+plt.title("Top 10 Product Categories by Sales Value")
+plt.xlabel("Sales Value")
+plt.ylabel("Product Category")
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/top_10_categories_by_revenue.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.show()

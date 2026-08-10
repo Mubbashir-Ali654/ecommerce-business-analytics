@@ -15,7 +15,3 @@ database/*.db
 # Raw datasets
 data/*.csv
 
-# Generated visualizations
-visualizations/*.png
-visualizations/*.jpg
-visualizations/*.jpeg
