@@ -83,229 +83,293 @@ customers = pd.read_csv("data/olist_customers_dataset.csv")
 
 orders = pd.read_csv("data/olist_orders_dataset.csv")
 
-print("\nFirst 5 orders:")
-print(orders.head())
+#print("\nFirst 5 orders:")
+#print(orders.head())
+
+#print("\nShape:")
+#print(orders.shape)
+
+#print("\nColumns:")
+#print(orders.columns)
+
+#print("\nData types:")
+#print(orders.dtypes)
+
+#print("\nMissing values:")
+#print(orders.isnull().sum())
+
+#print("\nDuplicate rows:")
+#print(orders.duplicated().sum())
+
+
+
+#print("\nOrder status distribution:")
+#print(orders["order_status"].value_counts())
+
+#print("\nSample purchase timestamps:")
+#print(orders["order_purchase_timestamp"].head(10))
+
+#print("\nUnique customers in orders:")
+#print(orders["customer_id"].nunique())
+
+#print("\nOrders per customer:")
+#print(orders["customer_id"].value_counts().head(10))
+
+
+#status_percentage = (
+#    orders["order_status"]
+#    .value_counts(normalize=True) * 100
+#)
+
+#print(status_percentage.round(2))
+
+
+#date_columns = [
+#    "order_purchase_timestamp",
+#    "order_approved_at",
+#    "order_delivered_carrier_date",
+#    "order_delivered_customer_date",
+#    "order_estimated_delivery_date"
+#]
+
+#for col in date_columns:
+#    orders[col] = pd.to_datetime(orders[col])
+
+#print(orders[date_columns].dtypes)
+
+
+#print("Earliest order:")
+#print(orders["order_purchase_timestamp"].min())
+
+#print("\nLatest order:")
+#print(orders["order_purchase_timestamp"].max())
+
+#orders["delivery_days"] = (
+#    orders["order_delivered_customer_date"]
+#    - orders["order_purchase_timestamp"]
+#).dt.total_seconds() / (24 * 60 * 60)
+
+#print(orders["delivery_days"].describe())
+
+#orders["delivery_delay_days"] = (
+#    orders["order_delivered_customer_date"]
+#    - orders["order_estimated_delivery_date"]
+#).dt.total_seconds() / (24 * 60 * 60)
+
+
+#print("\nDelivery time:")
+#print(orders["delivery_days"].describe())
+
+#print("\nDelivery delay:")
+#print(orders["delivery_delay_days"].describe())
+
+#print(
+#    "\nOrders delivered late:",
+#    (orders["delivery_delay_days"] > 0).sum()
+#)
+
+#print(
+#    "Orders delivered early:",
+#    (orders["delivery_delay_days"] < 0).sum()
+#)
+
+#print(
+#    "Orders delivered exactly on estimate:",
+#    (orders["delivery_delay_days"] == 0).sum()
+#)
+
+#longest_deliveries = (
+#    orders[
+#        orders["delivery_days"].notna()
+#    ]
+#    .sort_values("delivery_days", ascending=False)
+#    .loc[
+#        :,
+#        [
+#            "order_id",
+#            "order_status",
+#            "order_purchase_timestamp",
+#            "order_delivered_customer_date",
+#            "order_estimated_delivery_date",
+#            "delivery_days",
+#            "delivery_delay_days"
+#        ]
+#    ]
+#    .head(10)
+#)
+
+#print(longest_deliveries)
+
+#late_rate = (
+#    (orders["delivery_delay_days"] > 0).sum()
+#    / orders["delivery_delay_days"].notna().sum()
+#    * 100
+#)
+
+#print(f"Late delivery rate: {late_rate:.2f}%")
+
+#print(
+#    "Orders delivered in more than 30 days:",
+#    (orders["delivery_days"] > 30).sum()
+#)
+
+#print(
+#    "Orders delivered in more than 60 days:",
+#    (orders["delivery_days"] > 60).sum()
+#)
+
+#print(
+#    "Orders delivered in more than 90 days:",
+#    (orders["delivery_days"] > 90).sum()
+#)
+
+#delivered_count = orders["delivery_days"].notna().sum()
+
+#print(
+#    f">30 days: {(orders['delivery_days'] > 30).sum() / delivered_count * 100:.2f}%"
+#)
+
+#print(
+#    f">60 days: {(orders['delivery_days'] > 60).sum() / delivered_count * 100:.2f}%"
+#)
+
+#print(
+#    f">90 days: {(orders['delivery_days'] > 90).sum() / delivered_count * 100:.2f}%"
+#)
+
+#print("Mean:", orders["delivery_days"].mean())
+#print("Median:", orders["delivery_days"].median())
+
+#print(
+#    "90th percentile:",
+#    orders["delivery_days"].quantile(0.90)
+#)
+
+#print(
+#    "95th percentile:",
+#    orders["delivery_days"].quantile(0.95)
+#)
+
+#print(
+#    "99th percentile:",
+#    orders["delivery_days"].quantile(0.99)
+#)
+
+
+#orders_with_customer = orders.merge(
+#    customers[
+#        ["customer_id", "customer_unique_id"]
+#    ],
+#    on="customer_id",
+#    how="left"
+#)
+
+#print(orders_with_customer.head())
+
+#print("\nShape:")
+#print(orders_with_customer.shape)
+
+#print("\nMissing customer identities:")
+#print(
+#    orders_with_customer["customer_unique_id"].isnull().sum()
+#)
+
+
+#orders_per_customer = (
+#    orders_with_customer
+#    .groupby("customer_unique_id")["order_id"]
+#    .count()
+#    .sort_values(ascending=False)
+#)
+
+#print(orders_per_customer.head(10))
+
+
+#repeat_customers = (
+#    orders_per_customer > 1
+#).sum()
+
+#total_customers = orders_per_customer.shape[0]
+
+#print("Total customers:", total_customers)
+#print("Repeat customers:", repeat_customers)
+
+#repeat_purchase_rate = (
+#    repeat_customers / total_customers
+#) * 100
+
+#print(
+#    f"Repeat purchase rate: {repeat_purchase_rate:.2f}%"
+#)
+
+#repeat_distribution = (
+#    orders_per_customer[orders_per_customer > 1]
+#    .value_counts()
+#    .sort_index()
+#)
+
+#print(repeat_distribution)
+
+# ==========================================
+# ORDER ITEMS DATASET
+# ==========================================
+
+order_items = pd.read_csv(
+    "data/olist_order_items_dataset.csv"
+)
+
+print("\nFirst 5 order items:")
+print(order_items.head())
 
 print("\nShape:")
-print(orders.shape)
+print(order_items.shape)
 
 print("\nColumns:")
-print(orders.columns)
+print(order_items.columns)
 
 print("\nData types:")
-print(orders.dtypes)
+print(order_items.dtypes)
 
 print("\nMissing values:")
-print(orders.isnull().sum())
+print(order_items.isnull().sum())
 
 print("\nDuplicate rows:")
-print(orders.duplicated().sum())
+print(order_items.duplicated().sum())
 
-
-
-print("\nOrder status distribution:")
-print(orders["order_status"].value_counts())
-
-print("\nSample purchase timestamps:")
-print(orders["order_purchase_timestamp"].head(10))
-
-print("\nUnique customers in orders:")
-print(orders["customer_id"].nunique())
-
-print("\nOrders per customer:")
-print(orders["customer_id"].value_counts().head(10))
-
-
-status_percentage = (
-    orders["order_status"]
-    .value_counts(normalize=True) * 100
-)
-
-print(status_percentage.round(2))
-
-
-date_columns = [
-    "order_purchase_timestamp",
-    "order_approved_at",
-    "order_delivered_carrier_date",
-    "order_delivered_customer_date",
-    "order_estimated_delivery_date"
-]
-
-for col in date_columns:
-    orders[col] = pd.to_datetime(orders[col])
-
-print(orders[date_columns].dtypes)
-
-
-print("Earliest order:")
-print(orders["order_purchase_timestamp"].min())
-
-print("\nLatest order:")
-print(orders["order_purchase_timestamp"].max())
-
-orders["delivery_days"] = (
-    orders["order_delivered_customer_date"]
-    - orders["order_purchase_timestamp"]
-).dt.total_seconds() / (24 * 60 * 60)
-
-print(orders["delivery_days"].describe())
-
-orders["delivery_delay_days"] = (
-    orders["order_delivered_customer_date"]
-    - orders["order_estimated_delivery_date"]
-).dt.total_seconds() / (24 * 60 * 60)
-
-
-print("\nDelivery time:")
-print(orders["delivery_days"].describe())
-
-print("\nDelivery delay:")
-print(orders["delivery_delay_days"].describe())
-
-print(
-    "\nOrders delivered late:",
-    (orders["delivery_delay_days"] > 0).sum()
-)
-
-print(
-    "Orders delivered early:",
-    (orders["delivery_delay_days"] < 0).sum()
-)
-
-print(
-    "Orders delivered exactly on estimate:",
-    (orders["delivery_delay_days"] == 0).sum()
-)
-
-longest_deliveries = (
-    orders[
-        orders["delivery_days"].notna()
-    ]
-    .sort_values("delivery_days", ascending=False)
-    .loc[
-        :,
-        [
-            "order_id",
-            "order_status",
-            "order_purchase_timestamp",
-            "order_delivered_customer_date",
-            "order_estimated_delivery_date",
-            "delivery_days",
-            "delivery_delay_days"
-        ]
-    ]
-    .head(10)
-)
-
-print(longest_deliveries)
-
-late_rate = (
-    (orders["delivery_delay_days"] > 0).sum()
-    / orders["delivery_delay_days"].notna().sum()
-    * 100
-)
-
-print(f"Late delivery rate: {late_rate:.2f}%")
-
-print(
-    "Orders delivered in more than 30 days:",
-    (orders["delivery_days"] > 30).sum()
-)
-
-print(
-    "Orders delivered in more than 60 days:",
-    (orders["delivery_days"] > 60).sum()
-)
-
-print(
-    "Orders delivered in more than 90 days:",
-    (orders["delivery_days"] > 90).sum()
-)
-
-delivered_count = orders["delivery_days"].notna().sum()
-
-print(
-    f">30 days: {(orders['delivery_days'] > 30).sum() / delivered_count * 100:.2f}%"
-)
-
-print(
-    f">60 days: {(orders['delivery_days'] > 60).sum() / delivered_count * 100:.2f}%"
-)
-
-print(
-    f">90 days: {(orders['delivery_days'] > 90).sum() / delivered_count * 100:.2f}%"
-)
-
-print("Mean:", orders["delivery_days"].mean())
-print("Median:", orders["delivery_days"].median())
-
-print(
-    "90th percentile:",
-    orders["delivery_days"].quantile(0.90)
-)
-
-print(
-    "95th percentile:",
-    orders["delivery_days"].quantile(0.95)
-)
-
-print(
-    "99th percentile:",
-    orders["delivery_days"].quantile(0.99)
-)
-
-
-orders_with_customer = orders.merge(
-    customers[
-        ["customer_id", "customer_unique_id"]
-    ],
-    on="customer_id",
-    how="left"
-)
-
-print(orders_with_customer.head())
-
-print("\nShape:")
-print(orders_with_customer.shape)
-
-print("\nMissing customer identities:")
-print(
-    orders_with_customer["customer_unique_id"].isnull().sum()
-)
-
-
-orders_per_customer = (
-    orders_with_customer
-    .groupby("customer_unique_id")["order_id"]
+items_per_order = (
+    order_items
+    .groupby("order_id")["order_item_id"]
     .count()
     .sort_values(ascending=False)
 )
 
-print(orders_per_customer.head(10))
-
-
-repeat_customers = (
-    orders_per_customer > 1
-).sum()
-
-total_customers = orders_per_customer.shape[0]
-
-print("Total customers:", total_customers)
-print("Repeat customers:", repeat_customers)
-
-repeat_purchase_rate = (
-    repeat_customers / total_customers
-) * 100
+print(items_per_order.head(10))
 
 print(
-    f"Repeat purchase rate: {repeat_purchase_rate:.2f}%"
+    "Maximum items in one order:",
+    items_per_order.max()
 )
 
-repeat_distribution = (
-    orders_per_customer[orders_per_customer > 1]
-    .value_counts()
-    .sort_index()
+print("\nPrice statistics:")
+print(order_items["price"].describe())
+
+print("\nFreight statistics:")
+print(order_items["freight_value"].describe())
+
+order_items["shipping_limit_date"] = pd.to_datetime(
+    order_items["shipping_limit_date"]
 )
 
-print(repeat_distribution)
+print(order_items["shipping_limit_date"].dtype)
+
+print("\nShipping limit date range:")
+
+print(
+    "Earliest:",
+    order_items["shipping_limit_date"].min()
+)
+
+print(
+    "Latest:",
+    order_items["shipping_limit_date"].max()
+)
