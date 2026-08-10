@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local database
+database/*.db
+
+# Raw datasets
+data/*.csv
+
+# Generated visualizations
+visualizations/*.png
+visualizations/*.jpg
+visualizations/*.jpeg
