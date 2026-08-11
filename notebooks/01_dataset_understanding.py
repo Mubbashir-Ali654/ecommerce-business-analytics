@@ -781,3 +781,83 @@ print(reviews["review_score"].mean())
 
 print("\nReview score statistics:")
 print(reviews["review_score"].describe())
+
+
+# ==========================================
+# REVIEW QUALITY ANALYSIS
+# ==========================================
+
+print("\nReviews by score:")
+print(reviews["review_score"].value_counts().sort_index())
+
+# Positive / negative review groups
+positive_reviews = reviews[reviews["review_score"] >= 4]
+negative_reviews = reviews[reviews["review_score"] <= 2]
+
+print("\nPositive reviews (4-5):")
+print(len(positive_reviews))
+
+print("\nNegative reviews (1-2):")
+print(len(negative_reviews))
+
+print("\nPositive review percentage:")
+print(round(len(positive_reviews) / len(reviews) * 100, 2))
+
+print("\nNegative review percentage:")
+print(round(len(negative_reviews) / len(reviews) * 100, 2))
+
+# Reviews with written comments
+reviews_with_comments = reviews[
+    reviews["review_comment_message"].notna()
+]
+
+print("\nReviews with written comments:")
+print(len(reviews_with_comments))
+
+print("\nReviews without written comments:")
+print(reviews["review_comment_message"].isna().sum())
+
+print("\nWritten comment percentage:")
+print(
+    round(
+        len(reviews_with_comments) / len(reviews) * 100,
+        2
+    )
+)
+
+# Check whether every review belongs to a unique order
+print("\nUnique orders with reviews:")
+print(reviews["order_id"].nunique())
+
+print("\nReviews per order:")
+print(reviews["order_id"].value_counts().head(10))
+
+
+# ==========================================
+# REVIEW SCORE VISUALIZATION
+# ==========================================
+
+import matplotlib.pyplot as plt
+
+review_counts = reviews["review_score"].value_counts().sort_index()
+
+plt.figure(figsize=(8, 5))
+
+plt.bar(
+    review_counts.index.astype(str),
+    review_counts.values
+)
+
+plt.title("Review Score Distribution")
+plt.xlabel("Review Score")
+plt.ylabel("Number of Reviews")
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/review_score_distribution.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.show()
