@@ -383,143 +383,401 @@ products = pd.read_csv(
     "data/olist_products_dataset.csv"
 )
 
-print("\nFirst 5 products:")
-print(products.head())
+#print("\nFirst 5 products:")
+#print(products.head())
 
-print("\nShape:")
-print(products.shape)
+#print("\nShape:")
+#print(products.shape)
 
-print("\nColumns:")
-print(products.columns)
+#print("\nColumns:")
+#print(products.columns)
 
-print("\nData types:")
-print(products.dtypes)
+#print("\nData types:")
+#print(products.dtypes)
 
-print("\nMissing values:")
-print(products.isnull().sum())
+#print("\nMissing values:")
+#print(products.isnull().sum())
 
-print("\nDuplicate rows:")
-print(products.duplicated().sum())
-print("\nUnique product IDs:")
-print(products["product_id"].nunique())
+#print("\nDuplicate rows:")
+#print(products.duplicated().sum())
+#print("\nUnique product IDs:")
+#print(products["product_id"].nunique())
 
-print(
-    "Unique products in order_items:",
-    order_items["product_id"].nunique()
-)
+#print(
+#    "Unique products in order_items:",
+#    order_items["product_id"].nunique()
+#)
 
-print(
-    "Unique products in products:",
-    products["product_id"].nunique()
-)
+#print(
+#    "Unique products in products:",
+#    products["product_id"].nunique()
+#)
 
-missing_products = (
-    set(order_items["product_id"])
-    - set(products["product_id"])
-)
+#missing_products = (
+#    set(order_items["product_id"])
+#    - set(products["product_id"])
+#)
 
-print(
-    "Product IDs in order_items but missing from products:",
-    len(missing_products)
-)
+#print(
+#    "Product IDs in order_items but missing from products:",
+#    len(missing_products)
+#)
 
 
 # ==========================================
 # ORDER ITEMS + PRODUCTS
 # ==========================================
 
-items_products = order_items.merge(
-    products[
-        [
-            "product_id",
-            "product_category_name"
-        ]
-    ],
-    on="product_id",
-    how="left"
+#items_products = order_items.merge(
+#    products[
+#        [
+#            "product_id",
+#            "product_category_name"
+#        ]
+#    ],
+#    on="product_id",
+#    how="left"
+#)
+
+#print("\nMerged data:")
+#print(items_products.head())
+
+#print("\nShape:")
+#print(items_products.shape)
+
+#print("\nMissing product categories:")
+#print(
+#    items_products["product_category_name"].isnull().sum()
+#)
+
+#print(
+#    "Rows before merge:",
+#    len(order_items)
+#)
+
+#print(
+#    "Rows after merge:",
+#    len(items_products)
+#)
+
+#category_revenue = (
+#    items_products
+#    .groupby("product_category_name")["price"]
+#    .sum()
+#    .sort_values(ascending=False)
+#)
+
+#print("\nTop 10 categories by revenue:")
+#print(category_revenue.head(10))
+
+#print(
+#    "\nNumber of product categories:",
+#    category_revenue.shape[0]
+#)
+
+#uncategorized_revenue = items_products.loc[
+#    items_products["product_category_name"].isna(),
+#    "price"
+#].sum()
+
+#total_revenue = items_products["price"].sum()
+
+#print("Revenue from uncategorized products:", uncategorized_revenue)
+
+#print(
+#    "Uncategorized revenue percentage:",
+#    f"{uncategorized_revenue / total_revenue * 100:.2f}%"
+#)
+
+
+#import matplotlib.pyplot as plt
+#import seaborn as sns
+
+#top_10_categories = (
+#    items_products
+#    .dropna(subset=["product_category_name"])
+#    .groupby("product_category_name")["price"]
+#    .sum()
+#    .sort_values(ascending=False)
+#    .head(10)
+#    .sort_values()
+#)
+
+#plt.figure(figsize=(10, 6))
+
+#sns.barplot(
+#    x=top_10_categories.values,
+#    y=top_10_categories.index
+#)
+
+#plt.title("Top 10 Product Categories by Sales Value")
+#plt.xlabel("Sales Value")
+#plt.ylabel("Product Category")
+
+#plt.tight_layout()
+
+#plt.savefig(
+#    "visualizations/top_10_categories_by_revenue.png",
+#    dpi=300,
+#    bbox_inches="tight"
+#)
+
+#plt.show()
+
+
+ # ==========================================
+# PAYMENTS DATASET
+# ==========================================
+
+payments = pd.read_csv(
+    "data/olist_order_payments_dataset.csv"
 )
 
-print("\nMerged data:")
-print(items_products.head())
+#print("\nFirst 5 payments:")
+#print(payments.head())
+
+#print("\nShape:")
+#print(payments.shape)
+
+#print("\nColumns:")
+#print(payments.columns)
+
+#print("\nData types:")
+#print(payments.dtypes)
+
+#print("\nMissing values:")
+#print(payments.isnull().sum())
+
+#print("\nDuplicate rows:")
+#print(payments.duplicated().sum())
+
+#print("\nPayment types:")
+#print(payments["payment_type"].value_counts())
+
+#print("\nPayment type percentage:")
+#print(
+#    payments["payment_type"]
+#    .value_counts(normalize=True)
+#    .mul(100)
+#    .round(2)
+#)
+
+
+#print("\nInstallment statistics:")
+#print(payments["payment_installments"].describe())
+
+#print("\nInstallment distribution:")
+#print(
+#    payments["payment_installments"]
+#    .value_counts()
+#    .sort_index()
+#)
+
+#print("\nPayment value statistics:")
+#print(payments["payment_value"].describe())
+
+
+#payment_counts = (
+#    payments
+#    .groupby("order_id")
+#    .size()
+#    .sort_values(ascending=False)
+#)
+
+#print("\nTop orders by number of payment records:")
+#print(payment_counts.head(10))
+
+#print(
+#    "\nOrders with multiple payment records:",
+#    (payment_counts > 1).sum()
+#)
+
+#print(
+#    "Maximum payment records for one order:",
+#    payment_counts.max()
+#)
+
+#payment_order_ids = set(payments["order_id"])
+#order_ids = set(orders["order_id"])
+
+#missing_orders = payment_order_ids - order_ids
+
+#print(
+#    "Payment orders missing from orders:",
+#    len(missing_orders)
+#)
+
+#orders_without_payment = order_ids - payment_order_ids
+
+#print(
+#    "Orders without payment records:",
+#    len(orders_without_payment)
+#)
+
+# ==========================================
+# ORDER-LEVEL PAYMENT SUMMARY
+# ==========================================
+
+#order_payment_totals = (
+#    payments
+#    .groupby("order_id", as_index=False)["payment_value"]
+#    .sum()
+#    .rename(columns={"payment_value": "total_payment"})
+#)
+
+#print("\nOrder-level payment summary:")
+#print(order_payment_totals.head())
+
+#print("\nShape:")
+#print(order_payment_totals.shape)
+
+#print("\nDuplicate order IDs:")
+#print(order_payment_totals["order_id"].duplicated().sum())
+
+#print(
+#    "\nTotal payment value:",
+#    payments["payment_value"].sum()
+#)
+
+#print(
+#    "Total aggregated payment:",
+#    order_payment_totals["total_payment"].sum()
+#)
+
+#orders_with_payments = orders.merge(
+#    order_payment_totals,
+#    on="order_id",
+#    how="left"
+#)
+
+#print("\nOrders + payments:")
+#print(orders_with_payments.head())
+
+#print("\nShape:")
+#print(orders_with_payments.shape)
+
+#print("\nOrders without payment after merge:")
+#print(
+#    orders_with_payments["total_payment"].isnull().sum()
+#)
+
+
+# ==========================================
+# PAYMENT ANALYSIS
+# ==========================================
+
+#paid_orders = orders_with_payments.dropna(
+#    subset=["total_payment"]
+#)
+
+#average_order_value = paid_orders["total_payment"].mean()
+
+#print(
+#    "Average Order Value:",
+#    round(average_order_value, 2)
+#)
+
+#print("\nTotal paid orders:")
+#print(len(paid_orders))
+
+#print("\nTotal payment value:")
+#print(round(paid_orders["total_payment"].sum(), 2))
+
+#print("\nPayment statistics:")
+#print(
+#    paid_orders["total_payment"].describe()
+#)
+
+#payment_type_revenue = (
+#    payments
+#    .groupby("payment_type")["payment_value"]
+#    .sum()
+#    .sort_values(ascending=False)
+#)
+
+#print("\nPayment value by payment type:")
+#print(payment_type_revenue)
+
+#payment_type_revenue_pct = (
+#    payment_type_revenue
+#    / payment_type_revenue.sum()
+#    * 100
+#)
+
+#print("\nPayment value percentage:")
+#print(
+#    payment_type_revenue_pct.round(2)
+#)
+
+# ==========================================
+# PAYMENT VISUALIZATION
+# ==========================================
+
+#import matplotlib.pyplot as plt
+
+#payment_type_revenue = (
+#    payments
+#    .groupby("payment_type")["payment_value"]
+#    .sum()
+#    .sort_values(ascending=False)
+#)
+
+#plt.figure(figsize=(10, 6))
+
+#payment_type_revenue.plot(kind="bar")
+
+#plt.title("Payment Value by Payment Type")
+#plt.xlabel("Payment Type")
+#plt.ylabel("Total Payment Value")
+
+#plt.xticks(rotation=0)
+#plt.tight_layout()
+
+#plt.savefig(
+#    "visualizations/payment_value_by_type.png",
+#    dpi=300
+#)
+
+#plt.show()
+
+# ==========================================
+# ORDER REVIEWS DATASET
+# ==========================================
+
+reviews = pd.read_csv("data/olist_order_reviews_dataset.csv")
+
+print("\nFirst 5 reviews:")
+print(reviews.head())
 
 print("\nShape:")
-print(items_products.shape)
+print(reviews.shape)
 
-print("\nMissing product categories:")
+print("\nColumns:")
+print(reviews.columns)
+
+print("\nData types:")
+print(reviews.dtypes)
+
+print("\nMissing values:")
+print(reviews.isnull().sum())
+
+print("\nDuplicate rows:")
+print(reviews.duplicated().sum())
+
+print("\nReview score distribution:")
+print(reviews["review_score"].value_counts().sort_index())
+
+print("\nReview score percentage:")
 print(
-    items_products["product_category_name"].isnull().sum()
+    reviews["review_score"]
+    .value_counts(normalize=True)
+    .sort_index()
+    .mul(100)
+    .round(2)
 )
 
-print(
-    "Rows before merge:",
-    len(order_items)
-)
+print("\nAverage review score:")
+print(reviews["review_score"].mean())
 
-print(
-    "Rows after merge:",
-    len(items_products)
-)
-
-category_revenue = (
-    items_products
-    .groupby("product_category_name")["price"]
-    .sum()
-    .sort_values(ascending=False)
-)
-
-print("\nTop 10 categories by revenue:")
-print(category_revenue.head(10))
-
-print(
-    "\nNumber of product categories:",
-    category_revenue.shape[0]
-)
-
-uncategorized_revenue = items_products.loc[
-    items_products["product_category_name"].isna(),
-    "price"
-].sum()
-
-total_revenue = items_products["price"].sum()
-
-print("Revenue from uncategorized products:", uncategorized_revenue)
-
-print(
-    "Uncategorized revenue percentage:",
-    f"{uncategorized_revenue / total_revenue * 100:.2f}%"
-)
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-top_10_categories = (
-    items_products
-    .dropna(subset=["product_category_name"])
-    .groupby("product_category_name")["price"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(10)
-    .sort_values()
-)
-
-plt.figure(figsize=(10, 6))
-
-sns.barplot(
-    x=top_10_categories.values,
-    y=top_10_categories.index
-)
-
-plt.title("Top 10 Product Categories by Sales Value")
-plt.xlabel("Sales Value")
-plt.ylabel("Product Category")
-
-plt.tight_layout()
-
-plt.savefig(
-    "visualizations/top_10_categories_by_revenue.png",
-    dpi=300,
-    bbox_inches="tight"
-)
-
-plt.show()
+print("\nReview score statistics:")
+print(reviews["review_score"].describe())
