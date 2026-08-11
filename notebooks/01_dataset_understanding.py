@@ -746,118 +746,229 @@ payments = pd.read_csv(
 
 reviews = pd.read_csv("data/olist_order_reviews_dataset.csv")
 
-print("\nFirst 5 reviews:")
-print(reviews.head())
+#print("\nFirst 5 reviews:")
+#print(reviews.head())
 
-print("\nShape:")
-print(reviews.shape)
+#print("\nShape:")
+#print(reviews.shape)
 
-print("\nColumns:")
-print(reviews.columns)
+#print("\nColumns:")
+#print(reviews.columns)
 
-print("\nData types:")
-print(reviews.dtypes)
+#print("\nData types:")
+#print(reviews.dtypes)
 
-print("\nMissing values:")
-print(reviews.isnull().sum())
+#print("\nMissing values:")
+#print(reviews.isnull().sum())
 
-print("\nDuplicate rows:")
-print(reviews.duplicated().sum())
+#print("\nDuplicate rows:")
+#print(reviews.duplicated().sum())
 
-print("\nReview score distribution:")
-print(reviews["review_score"].value_counts().sort_index())
+#print("\nReview score distribution:")
+#print(reviews["review_score"].value_counts().sort_index())
 
-print("\nReview score percentage:")
-print(
-    reviews["review_score"]
-    .value_counts(normalize=True)
-    .sort_index()
-    .mul(100)
-    .round(2)
-)
+#print("\nReview score percentage:")
+#print(
+#    reviews["review_score"]
+#    .value_counts(normalize=True)
+#    .sort_index()
+#    .mul(100)
+#    .round(2)
+#)
 
-print("\nAverage review score:")
-print(reviews["review_score"].mean())
+#print("\nAverage review score:")
+#print(reviews["review_score"].mean())
 
-print("\nReview score statistics:")
-print(reviews["review_score"].describe())
+#print("\nReview score statistics:")
+#print(reviews["review_score"].describe())
 
 
 # ==========================================
 # REVIEW QUALITY ANALYSIS
 # ==========================================
 
-print("\nReviews by score:")
-print(reviews["review_score"].value_counts().sort_index())
+#print("\nReviews by score:")
+#print(reviews["review_score"].value_counts().sort_index())
 
 # Positive / negative review groups
-positive_reviews = reviews[reviews["review_score"] >= 4]
-negative_reviews = reviews[reviews["review_score"] <= 2]
+#positive_reviews = reviews[reviews["review_score"] >= 4]
+#negative_reviews = reviews[reviews["review_score"] <= 2]
 
-print("\nPositive reviews (4-5):")
-print(len(positive_reviews))
+#print("\nPositive reviews (4-5):")
+#print(len(positive_reviews))
 
-print("\nNegative reviews (1-2):")
-print(len(negative_reviews))
+#print("\nNegative reviews (1-2):")
+#print(len(negative_reviews))
 
-print("\nPositive review percentage:")
-print(round(len(positive_reviews) / len(reviews) * 100, 2))
+#print("\nPositive review percentage:")
+#print(round(len(positive_reviews) / len(reviews) * 100, 2))
 
-print("\nNegative review percentage:")
-print(round(len(negative_reviews) / len(reviews) * 100, 2))
+#print("\nNegative review percentage:")
+#print(round(len(negative_reviews) / len(reviews) * 100, 2))
 
 # Reviews with written comments
-reviews_with_comments = reviews[
-    reviews["review_comment_message"].notna()
-]
+#reviews_with_comments = reviews[
+#    reviews["review_comment_message"].notna()
+#]
 
-print("\nReviews with written comments:")
-print(len(reviews_with_comments))
+#print("\nReviews with written comments:")
+#print(len(reviews_with_comments))
 
-print("\nReviews without written comments:")
-print(reviews["review_comment_message"].isna().sum())
+#print("\nReviews without written comments:")
+#print(reviews["review_comment_message"].isna().sum())
 
-print("\nWritten comment percentage:")
-print(
-    round(
-        len(reviews_with_comments) / len(reviews) * 100,
-        2
-    )
-)
+#print("\nWritten comment percentage:")
+#print(
+#    round(
+#        len(reviews_with_comments) / len(reviews) * 100,
+#        2
+#    )
+#)
 
-# Check whether every review belongs to a unique order
-print("\nUnique orders with reviews:")
-print(reviews["order_id"].nunique())
+## Check whether every review belongs to a unique order
+#print("\nUnique orders with reviews:")
+#print(reviews["order_id"].nunique())
 
-print("\nReviews per order:")
-print(reviews["order_id"].value_counts().head(10))
+#print("\nReviews per order:")
+#print(reviews["order_id"].value_counts().head(10))
 
 
 # ==========================================
 # REVIEW SCORE VISUALIZATION
 # ==========================================
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
-review_counts = reviews["review_score"].value_counts().sort_index()
+#review_counts = reviews["review_score"].value_counts().sort_index()
 
-plt.figure(figsize=(8, 5))
+#plt.figure(figsize=(8, 5))
 
-plt.bar(
-    review_counts.index.astype(str),
-    review_counts.values
+#plt.bar(
+#    review_counts.index.astype(str),
+#    review_counts.values
+#)
+
+#plt.title("Review Score Distribution")
+#plt.xlabel("Review Score")
+#plt.ylabel("Number of Reviews")
+
+#plt.tight_layout()
+
+#plt.savefig(
+#    "visualizations/review_score_distribution.png",
+#    dpi=300,
+#    bbox_inches="tight"
+#)
+
+#plt.show()
+
+
+# ==========================================
+# SELLERS DATASET
+# ==========================================
+
+sellers = pd.read_csv("data/olist_sellers_dataset.csv")
+
+#print("\nFirst 5 sellers:")
+#print(sellers.head())
+
+#print("\nShape:")
+#print(sellers.shape)
+
+#print("\nColumns:")
+#print(sellers.columns)
+
+#print("\nData types:")
+#print(sellers.dtypes)
+
+#print("\nMissing values:")
+#print(sellers.isnull().sum())
+
+#print("\nDuplicate rows:")
+#print(sellers.duplicated().sum())
+
+#print("\nUnique seller IDs:")
+#print(sellers["seller_id"].nunique())
+
+#print("\nUnique seller states:")
+#print(sellers["seller_state"].nunique())
+
+#print("\nTop seller states:")
+#print(sellers["seller_state"].value_counts().head(10))
+
+#print("\nTop seller cities:")
+#print(sellers["seller_city"].value_counts().head(10))
+
+
+
+# ==========================================
+# GEOLOCATION DATASET
+# ==========================================
+
+geolocation = pd.read_csv("data/olist_geolocation_dataset.csv")
+
+#print("\nFirst 5 geolocation records:")
+#print(geolocation.head())
+
+#print("\nShape:")
+#print(geolocation.shape)
+
+#print("\nColumns:")
+#print(geolocation.columns)
+
+#print("\nData types:")
+#print(geolocation.dtypes)
+
+#print("\nMissing values:")
+#print(geolocation.isnull().sum())
+
+#print("\nDuplicate rows:")
+#print(geolocation.duplicated().sum())
+
+#print("\nUnique zip code prefixes:")
+#print(geolocation["geolocation_zip_code_prefix"].nunique())
+
+#print("\nUnique cities:")
+#print(geolocation["geolocation_city"].nunique())
+
+#print("\nUnique states:")
+#print(geolocation["geolocation_state"].nunique())
+
+#print("\nTop states:")
+#print(geolocation["geolocation_state"].value_counts().head(10))
+
+#print("\nTop cities:")
+#print(geolocation["geolocation_city"].value_counts().head(10))
+
+
+# ==========================================
+# PRODUCT CATEGORY TRANSLATION DATASET
+# ==========================================
+
+category_translation = pd.read_csv(
+    "data/product_category_name_translation.csv"
 )
 
-plt.title("Review Score Distribution")
-plt.xlabel("Review Score")
-plt.ylabel("Number of Reviews")
+print("\nFirst 5 category translations:")
+print(category_translation.head())
 
-plt.tight_layout()
+print("\nShape:")
+print(category_translation.shape)
 
-plt.savefig(
-    "visualizations/review_score_distribution.png",
-    dpi=300,
-    bbox_inches="tight"
-)
+print("\nColumns:")
+print(category_translation.columns)
 
-plt.show()
+print("\nData types:")
+print(category_translation.dtypes)
+
+print("\nMissing values:")
+print(category_translation.isnull().sum())
+
+print("\nDuplicate rows:")
+print(category_translation.duplicated().sum())
+
+print("\nUnique Portuguese categories:")
+print(category_translation["product_category_name"].nunique())
+
+print("\nUnique English categories:")
+print(category_translation["product_category_name_english"].nunique())
