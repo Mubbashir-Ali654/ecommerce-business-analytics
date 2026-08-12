@@ -70,7 +70,7 @@ plt.savefig(
     bbox_inches="tight"
 )
 
-plt.show()
+#plt.show()
 
 
 # ============================================================
@@ -140,7 +140,7 @@ plt.savefig(
     bbox_inches="tight"
 )
 
-plt.show()
+#plt.show()
 
 
 # ============================================================
@@ -204,7 +204,7 @@ plt.savefig(
     bbox_inches="tight"
 )
 
-plt.show()
+#plt.show()
 
 
 # Top sellers by order count
@@ -234,7 +234,7 @@ plt.savefig(
     bbox_inches="tight"
 )
 
-plt.show()
+#plt.show()
 
 
 # Seller revenue vs order volume
@@ -259,7 +259,7 @@ plt.savefig(
     bbox_inches="tight"
 )
 
-plt.show()
+#plt.show()
 
 
 # ============================================================
@@ -368,7 +368,7 @@ plt.savefig(
     bbox_inches="tight"
 )
 
-plt.show()
+#plt.show()
 
 
 # ============================================================
@@ -622,3 +622,322 @@ print(len(written_reviews))
 print("\n========================================")
 print("BUSINESS ANALYSIS COMPLETED SUCCESSFULLY")
 print("========================================")
+
+
+
+# ============================================================
+# CUSTOMER RETENTION ANALYSIS
+# ============================================================
+
+# Count unique orders per customer
+customer_order_counts = (
+    orders_customers
+    .groupby("customer_unique_id")["order_id"]
+    .nunique()
+)
+# Customer type
+customer_type = pd.Series(
+    "One-time Customer",
+    index=customer_order_counts.index
+)
+
+customer_type[customer_order_counts > 1] = "Repeat Customer"
+
+customer_type_counts = customer_type.value_counts()
+
+print("\nCustomer Type:")
+print(customer_type_counts)
+
+print("\nCustomer Type Percentage:")
+print(
+    (customer_type_counts / customer_type_counts.sum() * 100)
+    .round(2)
+)
+
+# Repeat customer rate
+repeat_customer_rate = (
+    (customer_order_counts > 1).sum()
+    / customer_order_counts.count()
+    * 100
+)
+
+print("\nTotal unique customers:")
+print(customer_order_counts.count())
+
+print("\nRepeat customers:")
+print((customer_order_counts > 1).sum())
+
+print("\nRepeat customer rate:")
+print(round(repeat_customer_rate, 2), "%")
+
+# Top repeat customers
+top_repeat_customers = (
+    customer_order_counts[customer_order_counts > 1]
+    .sort_values(ascending=False)
+    .head(10)
+)
+
+print("\nTop Repeat Customers:")
+print(top_repeat_customers)
+
+# ============================================================
+# VISUALIZATION - CUSTOMER TYPE
+# ============================================================
+
+plt.figure(figsize=(8, 6))
+
+plt.bar(
+    customer_type_counts.index,
+    customer_type_counts.values
+)
+
+plt.title("Customer Type Distribution")
+plt.xlabel("Customer Type")
+plt.ylabel("Number of Customers")
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/customer_type_distribution.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+#plt.show()
+
+# ============================================================
+# VISUALIZATION - TOP REPEAT CUSTOMERS
+# ============================================================
+
+top_repeat_customers_plot = top_repeat_customers.sort_values()
+
+plt.figure(figsize=(10, 6))
+
+plt.barh(
+    top_repeat_customers_plot.index,
+    top_repeat_customers_plot.values
+)
+
+plt.title("Top 10 Repeat Customers by Number of Orders")
+plt.xlabel("Number of Orders")
+plt.ylabel("Customer ID")
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/top_10_repeat_customers.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+#plt.show()
+
+
+# ============================================================
+# CUSTOMER REVENUE ANALYSIS
+# ============================================================
+
+customer_revenue = (
+    orders_customers
+    .groupby("customer_unique_id")["payment_value"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print("\nTop 10 Customers by Revenue:")
+print(customer_revenue.head(10))
+
+print("\nTotal Customer Revenue:")
+print(round(customer_revenue.sum(), 2))
+
+print("\nAverage Customer Revenue:")
+print(round(customer_revenue.mean(), 2))
+
+print("\nMedian Customer Revenue:")
+print(round(customer_revenue.median(), 2))
+
+
+# ============================================================
+# TOP 10 CUSTOMER REVENUE VISUALIZATION
+# ============================================================
+
+top_10_customers_revenue = (
+    customer_revenue
+    .head(10)
+    .sort_values()
+)
+
+plt.figure(figsize=(10, 6))
+
+plt.barh(
+    top_10_customers_revenue.index,
+    top_10_customers_revenue.values
+)
+
+plt.title("Top 10 Customers by Revenue")
+plt.xlabel("Revenue")
+plt.ylabel("Customer ID")
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/top_10_customers_by_revenue.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+#plt.show()
+
+
+# ============================================================
+# CUSTOMER VALUE: ONE-TIME VS REPEAT CUSTOMERS
+# ============================================================
+
+customer_summary = pd.DataFrame({
+    "orders": customer_order_counts,
+    "revenue": customer_revenue
+})
+
+customer_summary["customer_type"] = "One-time Customer"
+
+customer_summary.loc[
+    customer_summary["orders"] > 1,
+    "customer_type"
+] = "Repeat Customer"
+
+customer_value_by_type = (
+    customer_summary
+    .groupby("customer_type")
+    .agg(
+        customers=("orders", "count"),
+        total_revenue=("revenue", "sum"),
+        average_revenue=("revenue", "mean")
+    )
+)
+
+print("\nCustomer Value by Customer Type:")
+print(customer_value_by_type)
+
+print("\nAverage Revenue per Customer by Type:")
+print(
+    customer_value_by_type["average_revenue"].round(2)
+)
+
+# ============================================================
+# VISUALIZATION
+# ============================================================
+
+plt.figure(figsize=(8, 6))
+
+plt.bar(
+    customer_value_by_type.index,
+    customer_value_by_type["average_revenue"]
+)
+
+plt.title("Average Revenue per Customer: One-time vs Repeat")
+plt.xlabel("Customer Type")
+plt.ylabel("Average Revenue")
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/customer_value_by_type.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+#plt.show()
+
+
+# ============================================================
+# DELIVERY PERFORMANCE VS CUSTOMER SATISFACTION
+# ============================================================
+
+reviews = pd.read_csv(
+    "data/olist_order_reviews_dataset.csv"
+)
+
+# Select required review columns
+reviews_analysis = reviews[
+    [
+        "order_id",
+        "review_score"
+    ]
+].copy()
+
+# Merge reviews with delivery information
+delivery_reviews = orders[
+    [
+        "order_id",
+        "is_late",
+        "delivery_days"
+    ]
+].merge(
+    reviews_analysis,
+    on="order_id",
+    how="inner"
+)
+
+print("\nDelivery + Reviews:")
+print(delivery_reviews.head())
+
+print("\nShape:")
+print(delivery_reviews.shape)
+
+# Average review score by delivery status
+review_by_delivery = (
+    delivery_reviews
+    .groupby("is_late")["review_score"]
+    .agg(["count", "mean"])
+)
+
+print("\nReview Score by Delivery Status:")
+print(review_by_delivery)
+
+# Review score distribution by delivery status
+review_distribution = pd.crosstab(
+    delivery_reviews["review_score"],
+    delivery_reviews["is_late"],
+    normalize="columns"
+) * 100
+
+print("\nReview Score Distribution by Delivery Status (%):")
+print(review_distribution.round(2))
+
+# ============================================================
+# VISUALIZATION
+# ============================================================
+
+average_review = (
+    delivery_reviews
+    .groupby("is_late")["review_score"]
+    .mean()
+)
+
+average_review.index = [
+    "On-time",
+    "Late"
+]
+
+plt.figure(figsize=(8, 6))
+
+plt.bar(
+    average_review.index,
+    average_review.values
+)
+
+plt.title("Average Review Score: On-time vs Late Delivery")
+plt.xlabel("Delivery Status")
+plt.ylabel("Average Review Score")
+
+plt.ylim(0, 5)
+
+plt.tight_layout()
+
+plt.savefig(
+    "visualizations/review_score_by_delivery_status.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+#plt.show()
