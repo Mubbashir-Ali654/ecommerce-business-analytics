@@ -1,974 +1,718 @@
+from pathlib import Path
+
 import pandas as pd
-import numpy as np
 
-customers = pd.read_csv("data/olist_customers_dataset.csv")
 
-#print("First 5 rows:")
-#print(customers.head())
+# ============================================================
+# PROJECT PATHS
+# ============================================================
 
-#print("\nLast 5 rows:")
-#print(customers.tail())
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
 
-#print("\nShape:")
-#print(customers.shape)
 
-#print("\nColumns:")
-#print(customers.columns)
+# ============================================================
+# DATA FILES
+# ============================================================
 
-#print("\nData types:")
-#print(customers.dtypes)
+DATA_FILES = {
+    "customers": "olist_customers_dataset.csv",
+    "orders": "olist_orders_dataset.csv",
+    "order_items": "olist_order_items_dataset.csv",
+    "order_payments": "olist_order_payments_dataset.csv",
+    "order_reviews": "olist_order_reviews_dataset.csv",
+    "products": "olist_products_dataset.csv",
+    "sellers": "olist_sellers_dataset.csv",
+    "geolocation": "olist_geolocation_dataset.csv",
+    "category_translation": "product_category_name_translation.csv",
+}
 
-#print("\nDataset info:")
-#print(customers.info())
 
-#print("\nStatistical summary:")
-#print(customers.describe())
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
 
-#print("\nUnique values:")
-#print(customers.nunique())
+def load_dataset(file_name):
+    """Load a CSV dataset from the project data directory."""
+    file_path = DATA_DIR / file_name
 
-#print("\nMissing values:")
-#print(customers.isnull().sum())
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"Dataset not found: {file_path}"
+        )
 
-#print("Duplicate rows:", customers.duplicated().sum())
+    return pd.read_csv(file_path)
 
 
-#unique_counts = customers["customer_unique_id"].value_counts()
+def profile_dataset(name, df):
+    """Print a concise data-quality profile for a dataset."""
 
-#print(unique_counts.head(10))
+    print("\n" + "=" * 70)
+    print(f"{name.upper()} DATASET")
+    print("=" * 70)
 
-#print(
-#    "Customers appearing more than once:",
-#    (unique_counts > 1).sum()
-#)
+    print(f"Rows: {len(df):,}")
+    print(f"Columns: {len(df.columns):,}")
 
+    print("\nColumns:")
+    print(list(df.columns))
 
-#print(
-#    "Maximum records for one customer:",
-#    unique_counts.max()
-#)
+    print("\nData types:")
+    print(df.dtypes)
 
+    print("\nMissing values:")
+    missing_values = df.isnull().sum()
+    missing_values = missing_values[missing_values > 0]
 
-#print(
-#    customers["customer_state"]
-#    .value_counts()
-#    .head(10)
-#)
+    if missing_values.empty:
+        print("No missing values.")
+    else:
+        print(missing_values.sort_values(ascending=False))
 
+    print("\nDuplicate rows:")
+    print(df.duplicated().sum())
 
-#print(
-#    customers["customer_city"]
-#    .value_counts()
-#    .head(10)
-#)
 
-#customer_frequency = (
-#    customers
-#    .groupby("customer_unique_id")["customer_id"]
-#    .count()
-#    .sort_values(ascending=False)
-#)
+# ============================================================
+# 1. CUSTOMERS
+# ============================================================
 
-#print(customer_frequency.head(10))
+customers = load_dataset(DATA_FILES["customers"])
 
-#print(
-#    customer_frequency.value_counts()
-#    .sort_index()
-#)
+profile_dataset("Customers", customers)
 
+print("\nUnique customer IDs:")
+print(customers["customer_id"].nunique())
 
-# ==========================================
-# ORDERS DATASET
-# ==========================================
+print("\nUnique customer identities:")
+print(customers["customer_unique_id"].nunique())
 
-orders = pd.read_csv("data/olist_orders_dataset.csv")
-
-#print("\nFirst 5 orders:")
-#print(orders.head())
-
-#print("\nShape:")
-#print(orders.shape)
-
-#print("\nColumns:")
-#print(orders.columns)
-
-#print("\nData types:")
-#print(orders.dtypes)
-
-#print("\nMissing values:")
-#print(orders.isnull().sum())
-
-#print("\nDuplicate rows:")
-#print(orders.duplicated().sum())
-
-
-
-#print("\nOrder status distribution:")
-#print(orders["order_status"].value_counts())
-
-#print("\nSample purchase timestamps:")
-#print(orders["order_purchase_timestamp"].head(10))
-
-#print("\nUnique customers in orders:")
-#print(orders["customer_id"].nunique())
-
-#print("\nOrders per customer:")
-#print(orders["customer_id"].value_counts().head(10))
-
-
-#status_percentage = (
-#    orders["order_status"]
-#    .value_counts(normalize=True) * 100
-#)
-
-#print(status_percentage.round(2))
-
-
-#date_columns = [
-#    "order_purchase_timestamp",
-#    "order_approved_at",
-#    "order_delivered_carrier_date",
-#    "order_delivered_customer_date",
-#    "order_estimated_delivery_date"
-#]
-
-#for col in date_columns:
-#    orders[col] = pd.to_datetime(orders[col])
-
-#print(orders[date_columns].dtypes)
-
-
-#print("Earliest order:")
-#print(orders["order_purchase_timestamp"].min())
-
-#print("\nLatest order:")
-#print(orders["order_purchase_timestamp"].max())
-
-#orders["delivery_days"] = (
-#    orders["order_delivered_customer_date"]
-#    - orders["order_purchase_timestamp"]
-#).dt.total_seconds() / (24 * 60 * 60)
-
-#print(orders["delivery_days"].describe())
-
-#orders["delivery_delay_days"] = (
-#    orders["order_delivered_customer_date"]
-#    - orders["order_estimated_delivery_date"]
-#).dt.total_seconds() / (24 * 60 * 60)
-
-
-#print("\nDelivery time:")
-#print(orders["delivery_days"].describe())
-
-#print("\nDelivery delay:")
-#print(orders["delivery_delay_days"].describe())
-
-#print(
-#    "\nOrders delivered late:",
-#    (orders["delivery_delay_days"] > 0).sum()
-#)
-
-#print(
-#    "Orders delivered early:",
-#    (orders["delivery_delay_days"] < 0).sum()
-#)
-
-#print(
-#    "Orders delivered exactly on estimate:",
-#    (orders["delivery_delay_days"] == 0).sum()
-#)
-
-#longest_deliveries = (
-#    orders[
-#        orders["delivery_days"].notna()
-#    ]
-#    .sort_values("delivery_days", ascending=False)
-#    .loc[
-#        :,
-#        [
-#            "order_id",
-#            "order_status",
-#            "order_purchase_timestamp",
-#            "order_delivered_customer_date",
-#            "order_estimated_delivery_date",
-#            "delivery_days",
-#            "delivery_delay_days"
-#        ]
-#    ]
-#    .head(10)
-#)
-
-#print(longest_deliveries)
-
-#late_rate = (
-#    (orders["delivery_delay_days"] > 0).sum()
-#    / orders["delivery_delay_days"].notna().sum()
-#    * 100
-#)
-
-#print(f"Late delivery rate: {late_rate:.2f}%")
-
-#print(
-#    "Orders delivered in more than 30 days:",
-#    (orders["delivery_days"] > 30).sum()
-#)
-
-#print(
-#    "Orders delivered in more than 60 days:",
-#    (orders["delivery_days"] > 60).sum()
-#)
-
-#print(
-#    "Orders delivered in more than 90 days:",
-#    (orders["delivery_days"] > 90).sum()
-#)
-
-#delivered_count = orders["delivery_days"].notna().sum()
-
-#print(
-#    f">30 days: {(orders['delivery_days'] > 30).sum() / delivered_count * 100:.2f}%"
-#)
-
-#print(
-#    f">60 days: {(orders['delivery_days'] > 60).sum() / delivered_count * 100:.2f}%"
-#)
-
-#print(
-#    f">90 days: {(orders['delivery_days'] > 90).sum() / delivered_count * 100:.2f}%"
-#)
-
-#print("Mean:", orders["delivery_days"].mean())
-#print("Median:", orders["delivery_days"].median())
-
-#print(
-#    "90th percentile:",
-#    orders["delivery_days"].quantile(0.90)
-#)
-
-#print(
-#    "95th percentile:",
-#    orders["delivery_days"].quantile(0.95)
-#)
-
-#print(
-#    "99th percentile:",
-#    orders["delivery_days"].quantile(0.99)
-#)
-
-
-#orders_with_customer = orders.merge(
-#    customers[
-#        ["customer_id", "customer_unique_id"]
-#    ],
-#    on="customer_id",
-#    how="left"
-#)
-
-#print(orders_with_customer.head())
-
-#print("\nShape:")
-#print(orders_with_customer.shape)
-
-#print("\nMissing customer identities:")
-#print(
-#    orders_with_customer["customer_unique_id"].isnull().sum()
-#)
-
-
-#orders_per_customer = (
-#    orders_with_customer
-#    .groupby("customer_unique_id")["order_id"]
-#    .count()
-#    .sort_values(ascending=False)
-#)
-
-#print(orders_per_customer.head(10))
-
-
-#repeat_customers = (
-#    orders_per_customer > 1
-#).sum()
-
-#total_customers = orders_per_customer.shape[0]
-
-#print("Total customers:", total_customers)
-#print("Repeat customers:", repeat_customers)
-
-#repeat_purchase_rate = (
-#    repeat_customers / total_customers
-#) * 100
-
-#print(
-#    f"Repeat purchase rate: {repeat_purchase_rate:.2f}%"
-#)
-
-#repeat_distribution = (
-#    orders_per_customer[orders_per_customer > 1]
-#    .value_counts()
-#    .sort_index()
-#)
-
-#print(repeat_distribution)
-
-# ==========================================
-# ORDER ITEMS DATASET
-# ==========================================
-
-order_items = pd.read_csv(
-    "data/olist_order_items_dataset.csv"
+print("\nTop customer states:")
+print(
+    customers["customer_state"]
+    .value_counts()
+    .head(10)
 )
 
-#print("\nFirst 5 order items:")
-#print(order_items.head())
-
-#print("\nShape:")
-#print(order_items.shape)
-
-#print("\nColumns:")
-#print(order_items.columns)
-
-#print("\nData types:")
-#print(order_items.dtypes)
-
-#print("\nMissing values:")
-#print(order_items.isnull().sum())
-
-#print("\nDuplicate rows:")
-#print(order_items.duplicated().sum())
-
-#items_per_order = (
-#    order_items
-#    .groupby("order_id")["order_item_id"]
-#    .count()
-#    .sort_values(ascending=False)
-#)
-
-#print(items_per_order.head(10))
-
-#print(
-#    "Maximum items in one order:",
-#    items_per_order.max()
-#)
-
-#print("\nPrice statistics:")
-#print(order_items["price"].describe())
-
-#print("\nFreight statistics:")
-#print(order_items["freight_value"].describe())
-
-#order_items["shipping_limit_date"] = pd.to_datetime(
-#    order_items["shipping_limit_date"]
-#)
-
-#print(order_items["shipping_limit_date"].dtype)
-
-#print("\nShipping limit date range:")
-
-#print(
-#    "Earliest:",
-#    order_items["shipping_limit_date"].min()
-#)
-
-#print(
-#    "Latest:",
-#    order_items["shipping_limit_date"].max()
-#)
-
-
-# ==========================================
-# PRODUCTS DATASET
-# ==========================================
-
-products = pd.read_csv(
-    "data/olist_products_dataset.csv"
+print("\nTop customer cities:")
+print(
+    customers["customer_city"]
+    .value_counts()
+    .head(10)
 )
 
-#print("\nFirst 5 products:")
-#print(products.head())
-
-#print("\nShape:")
-#print(products.shape)
-
-#print("\nColumns:")
-#print(products.columns)
-
-#print("\nData types:")
-#print(products.dtypes)
-
-#print("\nMissing values:")
-#print(products.isnull().sum())
-
-#print("\nDuplicate rows:")
-#print(products.duplicated().sum())
-#print("\nUnique product IDs:")
-#print(products["product_id"].nunique())
-
-#print(
-#    "Unique products in order_items:",
-#    order_items["product_id"].nunique()
-#)
-
-#print(
-#    "Unique products in products:",
-#    products["product_id"].nunique()
-#)
-
-#missing_products = (
-#    set(order_items["product_id"])
-#    - set(products["product_id"])
-#)
-
-#print(
-#    "Product IDs in order_items but missing from products:",
-#    len(missing_products)
-#)
-
-
-# ==========================================
-# ORDER ITEMS + PRODUCTS
-# ==========================================
-
-#items_products = order_items.merge(
-#    products[
-#        [
-#            "product_id",
-#            "product_category_name"
-#        ]
-#    ],
-#    on="product_id",
-#    how="left"
-#)
-
-#print("\nMerged data:")
-#print(items_products.head())
-
-#print("\nShape:")
-#print(items_products.shape)
-
-#print("\nMissing product categories:")
-#print(
-#    items_products["product_category_name"].isnull().sum()
-#)
-
-#print(
-#    "Rows before merge:",
-#    len(order_items)
-#)
-
-#print(
-#    "Rows after merge:",
-#    len(items_products)
-#)
-
-#category_revenue = (
-#    items_products
-#    .groupby("product_category_name")["price"]
-#    .sum()
-#    .sort_values(ascending=False)
-#)
-
-#print("\nTop 10 categories by revenue:")
-#print(category_revenue.head(10))
-
-#print(
-#    "\nNumber of product categories:",
-#    category_revenue.shape[0]
-#)
-
-#uncategorized_revenue = items_products.loc[
-#    items_products["product_category_name"].isna(),
-#    "price"
-#].sum()
-
-#total_revenue = items_products["price"].sum()
-
-#print("Revenue from uncategorized products:", uncategorized_revenue)
-
-#print(
-#    "Uncategorized revenue percentage:",
-#    f"{uncategorized_revenue / total_revenue * 100:.2f}%"
-#)
-
-
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-
-#top_10_categories = (
-#    items_products
-#    .dropna(subset=["product_category_name"])
-#    .groupby("product_category_name")["price"]
-#    .sum()
-#    .sort_values(ascending=False)
-#    .head(10)
-#    .sort_values()
-#)
-
-#plt.figure(figsize=(10, 6))
-
-#sns.barplot(
-#    x=top_10_categories.values,
-#    y=top_10_categories.index
-#)
-
-#plt.title("Top 10 Product Categories by Sales Value")
-#plt.xlabel("Sales Value")
-#plt.ylabel("Product Category")
-
-#plt.tight_layout()
-
-#plt.savefig(
-#    "visualizations/top_10_categories_by_revenue.png",
-#    dpi=300,
-#    bbox_inches="tight"
-#)
-
-#plt.show()
-
-
- # ==========================================
-# PAYMENTS DATASET
-# ==========================================
-
-payments = pd.read_csv(
-    "data/olist_order_payments_dataset.csv"
+customer_frequency = (
+    customers
+    .groupby("customer_unique_id")["customer_id"]
+    .count()
+    .sort_values(ascending=False)
 )
 
-#print("\nFirst 5 payments:")
-#print(payments.head())
+print("\nCustomers with multiple customer records:")
+print((customer_frequency > 1).sum())
 
-#print("\nShape:")
-#print(payments.shape)
+print("\nMaximum records for one customer identity:")
+print(customer_frequency.max())
 
-#print("\nColumns:")
-#print(payments.columns)
 
-#print("\nData types:")
-#print(payments.dtypes)
+# ============================================================
+# 2. ORDERS
+# ============================================================
 
-#print("\nMissing values:")
-#print(payments.isnull().sum())
+orders = load_dataset(DATA_FILES["orders"])
 
-#print("\nDuplicate rows:")
-#print(payments.duplicated().sum())
+profile_dataset("Orders", orders)
 
-#print("\nPayment types:")
-#print(payments["payment_type"].value_counts())
-
-#print("\nPayment type percentage:")
-#print(
-#    payments["payment_type"]
-#    .value_counts(normalize=True)
-#    .mul(100)
-#    .round(2)
-#)
-
-
-#print("\nInstallment statistics:")
-#print(payments["payment_installments"].describe())
-
-#print("\nInstallment distribution:")
-#print(
-#    payments["payment_installments"]
-#    .value_counts()
-#    .sort_index()
-#)
-
-#print("\nPayment value statistics:")
-#print(payments["payment_value"].describe())
-
-
-#payment_counts = (
-#    payments
-#    .groupby("order_id")
-#    .size()
-#    .sort_values(ascending=False)
-#)
-
-#print("\nTop orders by number of payment records:")
-#print(payment_counts.head(10))
-
-#print(
-#    "\nOrders with multiple payment records:",
-#    (payment_counts > 1).sum()
-#)
-
-#print(
-#    "Maximum payment records for one order:",
-#    payment_counts.max()
-#)
-
-#payment_order_ids = set(payments["order_id"])
-#order_ids = set(orders["order_id"])
-
-#missing_orders = payment_order_ids - order_ids
-
-#print(
-#    "Payment orders missing from orders:",
-#    len(missing_orders)
-#)
-
-#orders_without_payment = order_ids - payment_order_ids
-
-#print(
-#    "Orders without payment records:",
-#    len(orders_without_payment)
-#)
-
-# ==========================================
-# ORDER-LEVEL PAYMENT SUMMARY
-# ==========================================
-
-#order_payment_totals = (
-#    payments
-#    .groupby("order_id", as_index=False)["payment_value"]
-#    .sum()
-#    .rename(columns={"payment_value": "total_payment"})
-#)
-
-#print("\nOrder-level payment summary:")
-#print(order_payment_totals.head())
-
-#print("\nShape:")
-#print(order_payment_totals.shape)
-
-#print("\nDuplicate order IDs:")
-#print(order_payment_totals["order_id"].duplicated().sum())
-
-#print(
-#    "\nTotal payment value:",
-#    payments["payment_value"].sum()
-#)
-
-#print(
-#    "Total aggregated payment:",
-#    order_payment_totals["total_payment"].sum()
-#)
-
-#orders_with_payments = orders.merge(
-#    order_payment_totals,
-#    on="order_id",
-#    how="left"
-#)
-
-#print("\nOrders + payments:")
-#print(orders_with_payments.head())
-
-#print("\nShape:")
-#print(orders_with_payments.shape)
-
-#print("\nOrders without payment after merge:")
-#print(
-#    orders_with_payments["total_payment"].isnull().sum()
-#)
-
-
-# ==========================================
-# PAYMENT ANALYSIS
-# ==========================================
-
-#paid_orders = orders_with_payments.dropna(
-#    subset=["total_payment"]
-#)
-
-#average_order_value = paid_orders["total_payment"].mean()
-
-#print(
-#    "Average Order Value:",
-#    round(average_order_value, 2)
-#)
-
-#print("\nTotal paid orders:")
-#print(len(paid_orders))
-
-#print("\nTotal payment value:")
-#print(round(paid_orders["total_payment"].sum(), 2))
-
-#print("\nPayment statistics:")
-#print(
-#    paid_orders["total_payment"].describe()
-#)
-
-#payment_type_revenue = (
-#    payments
-#    .groupby("payment_type")["payment_value"]
-#    .sum()
-#    .sort_values(ascending=False)
-#)
-
-#print("\nPayment value by payment type:")
-#print(payment_type_revenue)
-
-#payment_type_revenue_pct = (
-#    payment_type_revenue
-#    / payment_type_revenue.sum()
-#    * 100
-#)
-
-#print("\nPayment value percentage:")
-#print(
-#    payment_type_revenue_pct.round(2)
-#)
-
-# ==========================================
-# PAYMENT VISUALIZATION
-# ==========================================
-
-#import matplotlib.pyplot as plt
-
-#payment_type_revenue = (
-#    payments
-#    .groupby("payment_type")["payment_value"]
-#    .sum()
-#    .sort_values(ascending=False)
-#)
-
-#plt.figure(figsize=(10, 6))
-
-#payment_type_revenue.plot(kind="bar")
-
-#plt.title("Payment Value by Payment Type")
-#plt.xlabel("Payment Type")
-#plt.ylabel("Total Payment Value")
-
-#plt.xticks(rotation=0)
-#plt.tight_layout()
-
-#plt.savefig(
-#    "visualizations/payment_value_by_type.png",
-#    dpi=300
-#)
-
-#plt.show()
-
-# ==========================================
-# ORDER REVIEWS DATASET
-# ==========================================
-
-reviews = pd.read_csv("data/olist_order_reviews_dataset.csv")
-
-#print("\nFirst 5 reviews:")
-#print(reviews.head())
-
-#print("\nShape:")
-#print(reviews.shape)
-
-#print("\nColumns:")
-#print(reviews.columns)
-
-#print("\nData types:")
-#print(reviews.dtypes)
-
-#print("\nMissing values:")
-#print(reviews.isnull().sum())
-
-#print("\nDuplicate rows:")
-#print(reviews.duplicated().sum())
-
-#print("\nReview score distribution:")
-#print(reviews["review_score"].value_counts().sort_index())
-
-#print("\nReview score percentage:")
-#print(
-#    reviews["review_score"]
-#    .value_counts(normalize=True)
-#    .sort_index()
-#    .mul(100)
-#    .round(2)
-#)
-
-#print("\nAverage review score:")
-#print(reviews["review_score"].mean())
-
-#print("\nReview score statistics:")
-#print(reviews["review_score"].describe())
-
-
-# ==========================================
-# REVIEW QUALITY ANALYSIS
-# ==========================================
-
-#print("\nReviews by score:")
-#print(reviews["review_score"].value_counts().sort_index())
-
-# Positive / negative review groups
-#positive_reviews = reviews[reviews["review_score"] >= 4]
-#negative_reviews = reviews[reviews["review_score"] <= 2]
-
-#print("\nPositive reviews (4-5):")
-#print(len(positive_reviews))
-
-#print("\nNegative reviews (1-2):")
-#print(len(negative_reviews))
-
-#print("\nPositive review percentage:")
-#print(round(len(positive_reviews) / len(reviews) * 100, 2))
-
-#print("\nNegative review percentage:")
-#print(round(len(negative_reviews) / len(reviews) * 100, 2))
-
-# Reviews with written comments
-#reviews_with_comments = reviews[
-#    reviews["review_comment_message"].notna()
-#]
-
-#print("\nReviews with written comments:")
-#print(len(reviews_with_comments))
-
-#print("\nReviews without written comments:")
-#print(reviews["review_comment_message"].isna().sum())
-
-#print("\nWritten comment percentage:")
-#print(
-#    round(
-#        len(reviews_with_comments) / len(reviews) * 100,
-#        2
-#    )
-#)
-
-## Check whether every review belongs to a unique order
-#print("\nUnique orders with reviews:")
-#print(reviews["order_id"].nunique())
-
-#print("\nReviews per order:")
-#print(reviews["order_id"].value_counts().head(10))
-
-
-# ==========================================
-# REVIEW SCORE VISUALIZATION
-# ==========================================
-
-#import matplotlib.pyplot as plt
-
-#review_counts = reviews["review_score"].value_counts().sort_index()
-
-#plt.figure(figsize=(8, 5))
-
-#plt.bar(
-#    review_counts.index.astype(str),
-#    review_counts.values
-#)
-
-#plt.title("Review Score Distribution")
-#plt.xlabel("Review Score")
-#plt.ylabel("Number of Reviews")
-
-#plt.tight_layout()
-
-#plt.savefig(
-#    "visualizations/review_score_distribution.png",
-#    dpi=300,
-#    bbox_inches="tight"
-#)
-
-#plt.show()
-
-
-# ==========================================
-# SELLERS DATASET
-# ==========================================
-
-sellers = pd.read_csv("data/olist_sellers_dataset.csv")
-
-#print("\nFirst 5 sellers:")
-#print(sellers.head())
-
-#print("\nShape:")
-#print(sellers.shape)
-
-#print("\nColumns:")
-#print(sellers.columns)
-
-#print("\nData types:")
-#print(sellers.dtypes)
-
-#print("\nMissing values:")
-#print(sellers.isnull().sum())
-
-#print("\nDuplicate rows:")
-#print(sellers.duplicated().sum())
-
-#print("\nUnique seller IDs:")
-#print(sellers["seller_id"].nunique())
-
-#print("\nUnique seller states:")
-#print(sellers["seller_state"].nunique())
-
-#print("\nTop seller states:")
-#print(sellers["seller_state"].value_counts().head(10))
-
-#print("\nTop seller cities:")
-#print(sellers["seller_city"].value_counts().head(10))
-
-
-
-# ==========================================
-# GEOLOCATION DATASET
-# ==========================================
-
-geolocation = pd.read_csv("data/olist_geolocation_dataset.csv")
-
-#print("\nFirst 5 geolocation records:")
-#print(geolocation.head())
-
-#print("\nShape:")
-#print(geolocation.shape)
-
-#print("\nColumns:")
-#print(geolocation.columns)
-
-#print("\nData types:")
-#print(geolocation.dtypes)
-
-#print("\nMissing values:")
-#print(geolocation.isnull().sum())
-
-#print("\nDuplicate rows:")
-#print(geolocation.duplicated().sum())
-
-#print("\nUnique zip code prefixes:")
-#print(geolocation["geolocation_zip_code_prefix"].nunique())
-
-#print("\nUnique cities:")
-#print(geolocation["geolocation_city"].nunique())
-
-#print("\nUnique states:")
-#print(geolocation["geolocation_state"].nunique())
-
-#print("\nTop states:")
-#print(geolocation["geolocation_state"].value_counts().head(10))
-
-#print("\nTop cities:")
-#print(geolocation["geolocation_city"].value_counts().head(10))
-
-
-# ==========================================
-# PRODUCT CATEGORY TRANSLATION DATASET
-# ==========================================
-
-category_translation = pd.read_csv(
-    "data/product_category_name_translation.csv"
+print("\nOrder status distribution:")
+print(
+    orders["order_status"]
+    .value_counts()
 )
 
-print("\nFirst 5 category translations:")
-print(category_translation.head())
+order_date_columns = [
+    "order_purchase_timestamp",
+    "order_approved_at",
+    "order_delivered_carrier_date",
+    "order_delivered_customer_date",
+    "order_estimated_delivery_date",
+]
 
-print("\nShape:")
-print(category_translation.shape)
+for column in order_date_columns:
+    orders[column] = pd.to_datetime(
+        orders[column],
+        errors="coerce"
+    )
 
-print("\nColumns:")
-print(category_translation.columns)
+print("\nOrder date range:")
+print(
+    f"Earliest order: "
+    f"{orders['order_purchase_timestamp'].min()}"
+)
 
-print("\nData types:")
-print(category_translation.dtypes)
+print(
+    f"Latest order: "
+    f"{orders['order_purchase_timestamp'].max()}"
+)
 
-print("\nMissing values:")
-print(category_translation.isnull().sum())
+print("\nUnique customers in orders:")
+print(orders["customer_id"].nunique())
 
-print("\nDuplicate rows:")
-print(category_translation.duplicated().sum())
+print("\nOrders per customer:")
+print(
+    orders["customer_id"]
+    .value_counts()
+    .head(10)
+)
+
+orders["delivery_days"] = (
+    orders["order_delivered_customer_date"]
+    - orders["order_purchase_timestamp"]
+).dt.total_seconds() / (24 * 60 * 60)
+
+orders["delivery_delay_days"] = (
+    orders["order_delivered_customer_date"]
+    - orders["order_estimated_delivery_date"]
+).dt.total_seconds() / (24 * 60 * 60)
+
+delivered_orders = orders[
+    orders["order_delivered_customer_date"].notna()
+].copy()
+
+print("\nDelivered orders:")
+print(len(delivered_orders))
+
+if not delivered_orders.empty:
+
+    print("\nDelivery time statistics:")
+    print(
+        delivered_orders["delivery_days"]
+        .describe()
+        .round(2)
+    )
+
+    late_orders = (
+        delivered_orders["delivery_delay_days"] > 0
+    )
+
+    print("\nLate delivery rate:")
+    print(
+        f"{late_orders.mean() * 100:.2f}%"
+    )
+
+    print("\nOrders delivered late:")
+    print(late_orders.sum())
+
+    print("\nOrders delivered early:")
+    print(
+        (delivered_orders["delivery_delay_days"] < 0).sum()
+    )
+
+    print("\nOrders delivered on estimated date:")
+    print(
+        (delivered_orders["delivery_delay_days"] == 0).sum()
+    )
+
+
+# ============================================================
+# 3. ORDER ITEMS
+# ============================================================
+
+order_items = load_dataset(DATA_FILES["order_items"])
+
+profile_dataset("Order Items", order_items)
+
+print("\nUnique orders:")
+print(order_items["order_id"].nunique())
+
+print("\nUnique products:")
+print(order_items["product_id"].nunique())
+
+print("\nUnique sellers:")
+print(order_items["seller_id"].nunique())
+
+items_per_order = (
+    order_items
+    .groupby("order_id")["order_item_id"]
+    .count()
+    .sort_values(ascending=False)
+)
+
+print("\nMaximum items in one order:")
+print(items_per_order.max())
+
+print("\nPrice statistics:")
+print(
+    order_items["price"]
+    .describe()
+    .round(2)
+)
+
+print("\nFreight value statistics:")
+print(
+    order_items["freight_value"]
+    .describe()
+    .round(2)
+)
+
+order_items["shipping_limit_date"] = pd.to_datetime(
+    order_items["shipping_limit_date"],
+    errors="coerce"
+)
+
+print("\nShipping limit date range:")
+print(
+    f"Earliest: "
+    f"{order_items['shipping_limit_date'].min()}"
+)
+
+print(
+    f"Latest: "
+    f"{order_items['shipping_limit_date'].max()}"
+)
+
+
+# ============================================================
+# 4. PRODUCTS
+# ============================================================
+
+products = load_dataset(DATA_FILES["products"])
+
+profile_dataset("Products", products)
+
+print("\nUnique product IDs:")
+print(products["product_id"].nunique())
+
+print("\nNumber of product categories:")
+print(
+    products["product_category_name"]
+    .nunique(dropna=True)
+)
+
+print("\nTop product categories:")
+print(
+    products["product_category_name"]
+    .value_counts()
+    .head(10)
+)
+
+missing_product_ids = (
+    set(order_items["product_id"])
+    - set(products["product_id"])
+)
+
+print(
+    "\nProduct IDs in order items but missing "
+    "from products:"
+)
+print(len(missing_product_ids))
+
+
+# ============================================================
+# 5. ORDER ITEMS + PRODUCTS DATA QUALITY CHECK
+# ============================================================
+
+order_items_products = order_items.merge(
+    products[
+        [
+            "product_id",
+            "product_category_name",
+        ]
+    ],
+    on="product_id",
+    how="left",
+)
+
+print("\n" + "=" * 70)
+print("ORDER ITEMS + PRODUCTS RELATIONSHIP")
+print("=" * 70)
+
+print("\nRows before merge:")
+print(len(order_items))
+
+print("\nRows after merge:")
+print(len(order_items_products))
+
+print("\nMissing product categories after merge:")
+print(
+    order_items_products["product_category_name"]
+    .isnull()
+    .sum()
+)
+
+
+# ============================================================
+# 6. ORDER PAYMENTS
+# ============================================================
+
+payments = load_dataset(DATA_FILES["order_payments"])
+
+profile_dataset("Order Payments", payments)
+
+print("\nPayment type distribution:")
+print(
+    payments["payment_type"]
+    .value_counts()
+)
+
+print("\nPayment type percentage:")
+print(
+    payments["payment_type"]
+    .value_counts(normalize=True)
+    .mul(100)
+    .round(2)
+)
+
+print("\nPayment value statistics:")
+print(
+    payments["payment_value"]
+    .describe()
+    .round(2)
+)
+
+print("\nInstallment statistics:")
+print(
+    payments["payment_installments"]
+    .describe()
+    .round(2)
+)
+
+payment_counts = (
+    payments
+    .groupby("order_id")
+    .size()
+    .sort_values(ascending=False)
+)
+
+print("\nOrders with multiple payment records:")
+print((payment_counts > 1).sum())
+
+print("\nMaximum payment records for one order:")
+print(payment_counts.max())
+
+payment_order_ids = set(payments["order_id"])
+order_ids = set(orders["order_id"])
+
+print("\nPayment records without matching order:")
+print(
+    len(payment_order_ids - order_ids)
+)
+
+print("\nOrders without payment records:")
+print(
+    len(order_ids - payment_order_ids)
+)
+
+
+# ============================================================
+# 7. ORDER REVIEWS
+# ============================================================
+
+reviews = load_dataset(DATA_FILES["order_reviews"])
+
+profile_dataset("Order Reviews", reviews)
+
+print("\nReview score distribution:")
+print(
+    reviews["review_score"]
+    .value_counts()
+    .sort_index()
+)
+
+print("\nReview score percentage:")
+print(
+    reviews["review_score"]
+    .value_counts(normalize=True)
+    .sort_index()
+    .mul(100)
+    .round(2)
+)
+
+print("\nAverage review score:")
+print(
+    round(
+        reviews["review_score"].mean(),
+        2
+    )
+)
+
+positive_reviews = reviews[
+    reviews["review_score"] >= 4
+]
+
+negative_reviews = reviews[
+    reviews["review_score"] <= 2
+]
+
+print("\nPositive reviews (4-5):")
+print(len(positive_reviews))
+
+print("\nNegative reviews (1-2):")
+print(len(negative_reviews))
+
+written_reviews = reviews[
+    reviews["review_comment_message"]
+    .fillna("")
+    .str.strip()
+    != ""
+]
+
+print("\nReviews with written comments:")
+print(len(written_reviews))
+
+print("\nUnique orders with reviews:")
+print(reviews["order_id"].nunique())
+
+reviews_per_order = (
+    reviews["order_id"]
+    .value_counts()
+)
+
+print("\nMaximum reviews associated with one order:")
+print(reviews_per_order.max())
+
+
+# ============================================================
+# 8. SELLERS
+# ============================================================
+
+sellers = load_dataset(DATA_FILES["sellers"])
+
+profile_dataset("Sellers", sellers)
+
+print("\nUnique seller IDs:")
+print(sellers["seller_id"].nunique())
+
+print("\nUnique seller states:")
+print(sellers["seller_state"].nunique())
+
+print("\nTop seller states:")
+print(
+    sellers["seller_state"]
+    .value_counts()
+    .head(10)
+)
+
+print("\nTop seller cities:")
+print(
+    sellers["seller_city"]
+    .value_counts()
+    .head(10)
+)
+
+
+# ============================================================
+# 9. GEOLOCATION
+# ============================================================
+
+geolocation = load_dataset(DATA_FILES["geolocation"])
+
+profile_dataset("Geolocation", geolocation)
+
+print("\nUnique zip code prefixes:")
+print(
+    geolocation["geolocation_zip_code_prefix"]
+    .nunique()
+)
+
+print("\nUnique cities:")
+print(
+    geolocation["geolocation_city"]
+    .nunique()
+)
+
+print("\nUnique states:")
+print(
+    geolocation["geolocation_state"]
+    .nunique()
+)
+
+print("\nTop geolocation states:")
+print(
+    geolocation["geolocation_state"]
+    .value_counts()
+    .head(10)
+)
+
+print("\nTop geolocation cities:")
+print(
+    geolocation["geolocation_city"]
+    .value_counts()
+    .head(10)
+)
+
+
+# ============================================================
+# 10. CATEGORY TRANSLATION
+# ============================================================
+
+category_translation = load_dataset(
+    DATA_FILES["category_translation"]
+)
+
+profile_dataset(
+    "Category Translation",
+    category_translation
+)
 
 print("\nUnique Portuguese categories:")
-print(category_translation["product_category_name"].nunique())
+print(
+    category_translation[
+        "product_category_name"
+    ].nunique()
+)
 
 print("\nUnique English categories:")
-print(category_translation["product_category_name_english"].nunique())
+print(
+    category_translation[
+        "product_category_name_english"
+    ].nunique()
+)
+
+
+# ============================================================
+# 11. CROSS-DATASET RELATIONSHIP CHECKS
+# ============================================================
+
+print("\n" + "=" * 70)
+print("CROSS-DATASET RELATIONSHIP CHECKS")
+print("=" * 70)
+
+customer_ids = set(customers["customer_id"])
+order_customer_ids = set(orders["customer_id"])
+
+print("\nOrders with missing customer reference:")
+print(
+    len(order_customer_ids - customer_ids)
+)
+
+product_ids = set(products["product_id"])
+item_product_ids = set(order_items["product_id"])
+
+print("\nOrder items with missing product reference:")
+print(
+    len(item_product_ids - product_ids)
+)
+
+seller_ids = set(sellers["seller_id"])
+item_seller_ids = set(order_items["seller_id"])
+
+print("\nOrder items with missing seller reference:")
+print(
+    len(item_seller_ids - seller_ids)
+)
+
+review_order_ids = set(reviews["order_id"])
+
+print("\nReviews with missing order reference:")
+print(
+    len(review_order_ids - order_ids)
+)
+
+
+# ============================================================
+# 12. CUSTOMER FREQUENCY ANALYSIS
+# ============================================================
+
+customer_orders = (
+    orders
+    .merge(
+        customers[
+            [
+                "customer_id",
+                "customer_unique_id",
+            ]
+        ],
+        on="customer_id",
+        how="left",
+    )
+    .groupby("customer_unique_id")["order_id"]
+    .nunique()
+)
+
+one_time_customers = (
+    customer_orders == 1
+).sum()
+
+repeat_customers = (
+    customer_orders > 1
+).sum()
+
+total_unique_customers = (
+    customer_orders.count()
+)
+
+print("\n" + "=" * 70)
+print("CUSTOMER PURCHASE FREQUENCY")
+print("=" * 70)
+
+print(
+    f"\nTotal unique customers: "
+    f"{total_unique_customers:,}"
+)
+
+print(
+    f"One-time customers: "
+    f"{one_time_customers:,}"
+)
+
+print(
+    f"Repeat customers: "
+    f"{repeat_customers:,}"
+)
+
+print(
+    f"Repeat customer rate: "
+    f"{repeat_customers / total_unique_customers * 100:.2f}%"
+)
+
+
+# ============================================================
+# FINAL SUMMARY
+# ============================================================
+
+print("\n" + "=" * 70)
+print("DATASET UNDERSTANDING COMPLETED SUCCESSFULLY")
+print("=" * 70)
+
+print(
+    f"\nDatasets analysed: {len(DATA_FILES)}"
+)
+
+print(
+    f"Customers: {len(customers):,}"
+)
+
+print(
+    f"Orders: {len(orders):,}"
+)
+
+print(
+    f"Order items: {len(order_items):,}"
+)
+
+print(
+    f"Payments: {len(payments):,}"
+)
+
+print(
+    f"Reviews: {len(reviews):,}"
+)
+
+print(
+    f"Products: {len(products):,}"
+)
+
+print(
+    f"Sellers: {len(sellers):,}"
+)
+
+print(
+    f"Geolocation records: {len(geolocation):,}"
+)
+
+print(
+    f"Category translations: "
+    f"{len(category_translation):,}"
+)
+
+print("\n" + "=" * 70)
